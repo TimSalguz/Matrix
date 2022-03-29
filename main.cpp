@@ -1,5 +1,6 @@
 #include <iostream>
 #include <initializer_list>
+#include <iomanip>
 #define MY_DEBUG
 
 
@@ -16,7 +17,7 @@ private:
 	//Глобально в классе объявляю линии, столбцы, матрицу саму.
 	int m_lines;
 	int m_columns;
-	int **m_matrix;
+	dataType **m_matrix;
 public:
 	//Задать элемент матрицы
 	void Set(int i, int j, dataType data) {
@@ -41,9 +42,9 @@ public:
 #endif
 		m_lines = lines;
 		m_columns = columns;
-		m_matrix = new int*[m_lines];
+		m_matrix = new dataType*[m_lines];
 		for (int i = 0; i < lines; ++i)
-			m_matrix[i] = new int[m_columns];
+			m_matrix[i] = new dataType[m_columns];
 
 	}                                       //Конструктор конец
 
@@ -63,9 +64,9 @@ public:
 #endif
 		m_lines = B.m_lines;
 		m_columns = B.m_columns;
-		m_matrix = new int*[m_lines];
+		m_matrix = new dataType*[m_lines];
 		for (int i = 0; i < m_lines; ++i)
-			m_matrix[i] = new int[m_columns];
+			m_matrix[i] = new dataType[m_columns];
 		for (int i = 0; i < m_lines; ++i)
 			for (int j = 0; j < m_columns; ++j)
 				m_matrix[i][j] = B.m_matrix[i][j];
@@ -107,7 +108,6 @@ public:
 				B.m_matrix[i][j] += m_matrix[i][j];
 		return B;
 	}
-
 
 
 	Matrix<dataType> operator*(const Matrix &B) {
@@ -228,19 +228,13 @@ public:
 int main() {
 
 	//Создаю матрицу А, В
-	Matrix<double> A(10, 10);
+	Matrix<double> A(4, 4);
 
 	//Заполняю матрицу А, В
-    A ={1,4,0,0,0,0,0,0,0,0,
-		0,1,0,0,0,10,0,0,0,0,
-		0,0,1,0,0,0,5.6,0,0,0,
-		0,0,0,1,0,0,0,50,3,0,
-		0,0,0,0,1,0,0,0,0,0,
-		0,10,0,0,0,1,0,0,0,0,
-		0,0,0,0,0,0,1,0,0,0,
-		0,0,0,0,0,0,0,1,0,0,
-		0,0,0,7,0,0,0,0,1,0,
-		0,0,0,0,0,8.9,0,0,0,1};
+    A ={1.5,  2.2, 3.9, 9.7,
+		4.3,  5.7, 6.1, 0.3,
+		7,    8.9, 9.2, 3.3,
+		9.43, 3.8, 1.1, 12.2};
     
 	//Печатаю матрицы
 	std::cout << "matrix A" << std::endl;

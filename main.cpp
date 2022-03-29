@@ -1,6 +1,15 @@
 #include <iostream>
 #include <initializer_list>
 #define MY_DEBUG
+
+
+
+int factorial(int number) {
+	int a = 1;
+	for(int i = 1; i<=number; ++i)
+		a *=i;
+	return a;
+}
 template<typename dataType>
 class Matrix {
 private:
@@ -26,7 +35,7 @@ public:
 	dataType Get(int i, int j) { return m_matrix[i][j]; }
 
 
-	Matrix(int lines, int columns) {         //Конструктор начало
+	Matrix<dataType>(int lines, int columns) {         //Конструктор начало
 #ifdef MY_DEBUG
 		std::cout << "CONSTRUCTOR" << std::endl;
 #endif
@@ -48,7 +57,7 @@ public:
 	}                                       //Деструктор конец
 
 	//КОНСТРУКТОР КОПИРОВАНИЯ
-	Matrix(const Matrix &B){
+	Matrix<dataType>(const Matrix<dataType> &B){
 #ifdef MY_DEBUG
 		std::cout << "Copy constructor" << std::endl;
 #endif
@@ -85,7 +94,7 @@ public:
 			std::cout << m_matrix[i][j] << std::endl;
 	}
 	
-	Matrix operator+(const Matrix B) {
+	Matrix<dataType> operator+(const Matrix B) {
 #ifdef MY_DEBUG
 		std::cout << "OPERATOR+" << std::endl;
 #endif
@@ -101,7 +110,7 @@ public:
 
 
 
-	Matrix operator*(const Matrix &B) {
+	Matrix<dataType> operator*(const Matrix &B) {
 #ifdef MY_DEBUG
 		std::cout << "OPERATOR*" << std::endl;
 #endif
@@ -121,7 +130,7 @@ public:
 		return tmp;
 	}
 
-	Matrix operator=(const Matrix<dataType> B) {
+	Matrix<dataType> operator=(const Matrix<dataType> B) {
 #ifdef MY_DEBUG
 		std::cout << "OPERATOR=" << std::endl;
 #endif
@@ -134,7 +143,7 @@ public:
 	}
 
 
-	Matrix operator=(std::initializer_list<dataType> list) {
+	Matrix<dataType> operator=(std::initializer_list<dataType> list) {
 #ifdef MY_DEBUG
 		std::cout << "OPERATOR(std::initializer_list<uint8>)" << std::endl;
 #endif
@@ -151,28 +160,93 @@ public:
         }
 		return *this;
 	}
-};
 
+	dataType Det()
+	{
+		if(m_lines !=m_columns) {std::cout << "LINES !=COLUMNS!" <<std::endl; return 0;}
+		int n = m_lines;
+		int a[n];
+		int i,j,k,i1,i2;
+		int temp;
+		dataType sum = 0;
+		dataType mnoj = 1;
+		//Заполняю массив числами от 1 до n
+		for(i=0; i<n; i++) a[i]=i;
+		//Создаю цикл
+		for(int q = 0;q<factorial(m_lines); q++) {
+			//for(i=0; i<n; i++) std::cout << a[i] << " ";
+			//std::cout << std::endl;
+			//Умножаю все числа
+			for(int qq = 0; qq < m_lines; ++qq){
+				//std::cout << "[" << qq << "][" <<a[qq] << "]" << m_matrix[qq][a[qq]] << std::endl;
+				mnoj *= m_matrix[qq][a[qq]];
+			}
+			
+			//Подсчет количества инверсий
+			int summa = 0;
+			for(int v = 0; v < m_lines-1; ++v)
+				for(int vv = v; vv < m_lines; ++vv)
+					if(a[v]>a[vv])
+						summa++;
+
+			//std::cout << "Summa = " << summa <<std::endl;
+			if(summa & 1){
+				sum-=mnoj;
+				//std::cout << "NECHETNOE, otnimaem" <<std::endl;
+			}
+			else {
+				sum+=mnoj;
+				//std::cout << "Chetnoe, pribavlyaem" <<std::endl;
+			}
+			
+			//std::cout << mnoj << std::endl;
+			mnoj = 1;
+			//std::cout << "SUM = " << sum << std::endl;
+
+
+			//Подбираю нужную j, которой не было
+			for(j=n-1; j>0; j--)
+				if(a[j]>a[j-1]) break;
+			j--;
+			for(k=n-1; k>j; k--) {
+				if(a[k]>a[j]) {
+					std::swap(a[k], a[j]);
+					break;
+				}
+			}
+			for(i1=j+1,i2=n-1; i1<i2; i1++,i2--) {
+				std::swap(a[i1],a[i2]);
+			}
+		}
+		return sum;
+	}
+
+
+
+};
 
 int main() {
 
 	//Создаю матрицу А, В
-	Matrix<double> A(5, 5);
-	Matrix<double> B(5, 2);
+	Matrix<double> A(10, 10);
 
 	//Заполняю матрицу А, В
-    A = {1,2,4,4,2,2,4,4,2,6,2,4,4,2,6,2,4,4,2,6,2,4,4,2,6};
-    B = {2,3,1,2,5,77,8,4,3,5};
-
+    A ={1,4,0,0,0,0,0,0,0,0,
+		0,1,0,0,0,10,0,0,0,0,
+		0,0,1,0,0,0,5.6,0,0,0,
+		0,0,0,1,0,0,0,50,3,0,
+		0,0,0,0,1,0,0,0,0,0,
+		0,10,0,0,0,1,0,0,0,0,
+		0,0,0,0,0,0,1,0,0,0,
+		0,0,0,0,0,0,0,1,0,0,
+		0,0,0,7,0,0,0,0,1,0,
+		0,0,0,0,0,8.9,0,0,0,1};
+    
 	//Печатаю матрицы
 	std::cout << "matrix A" << std::endl;
 	A.CPrint();
-	std::cout << "matrix B" << std::endl;
-	B.CPrint();
 
-	auto C = A*B;
-	std::cout << "matrix C" << std::endl;
-	C.CPrint();
+	std::cout << "DET = " << A.Det() << std::endl;
 	getchar();
 	return 0;
 }
